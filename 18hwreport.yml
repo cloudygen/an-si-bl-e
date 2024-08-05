@@ -1,0 +1,23 @@
+---
+- name: generating hardware reports on all hosts conditionally
+  hosts: all
+  tasks: 
+    - name: downloading empty hw report
+      ansible.builtin.get_url:
+        url: http://192.168.1.247/downloads/hwreport.empty 
+        dest: /home/rhceuser/hwreport.txt
+        mode: '0664'
+        owner: rhceuser
+        group: rhceuser
+    - name: using block and rescue
+      block:
+        - name: templating the downloaded file now
+          ansible.builtin.template:
+            src: templates/18all.j2
+            dest: /home/rhceuser/hwreport.txt
+      rescue:
+        - name: templating the downloaded file to none now.
+          ansible.builtin.template:
+            src: templates/18noSDB.j2
+            dest: /home/rhceuser/hwreport.txt
+...

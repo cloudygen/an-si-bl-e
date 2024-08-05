@@ -1,0 +1,39 @@
+---
+- name: creating users conditionally
+  hosts: all
+  vars_files:
+    -  userlistagain.yml
+    -  locker.yml
+  tasks:
+    - name: creating devops1 group in dev and db
+      ansible.builtin.group:
+        name: devops1
+        state: present
+      when: inventory_hostname in groups['dev'] or inventory_hostname in groups['db'] 
+
+    - name: creating opsmgr1 group in prod host
+      ansible.builtin.group:
+        name: opsmgr1
+        state: present
+      when: inventory_hostname in groups['prod']
+
+    - name: creating developer users in dev and db group conditionally
+      ansible.builtin.user:
+        name: "{{ item.name }}"
+        password: "{{ PW_developer | password_hash('sha512') }}"
+        groups: devops1
+      when: 
+        - item.job == "developer"
+        - inventory_hostname in groups['dev'] or inventory_hostname in groups['db']
+      loop: "{{ userlist101 }}"
+     
+    - name: creating manager users in prod conditionally
+      ansible.builtin.user:
+        name: "{{ item.name }}"
+        password: "{{ PW_manager | password_hash('sha512') }}"
+        groups: opsmgr1
+      when: 
+        - item.job == "manager"
+        - inventory_hostname in groups['prod']
+      loop: "{{ userlist101 }}"
+...

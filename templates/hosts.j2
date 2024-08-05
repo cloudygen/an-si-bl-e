@@ -1,0 +1,7 @@
+127.0.0.1 localhost localhost.localdomain localhost4 localhost4.localdomain4 
+::1 localhost localhost.localdomain localhost6 localhost6.localdomain6 
+
+###dynamically added hosts using jinja2 templates###
+{% for hosts in groups['all'] %}
+{{ hostvars[hosts]['ansible_facts']['default_ipv4']['address'] }}   {{ hostvars[hosts]['ansible_facts']['fqdn'] }}   {{ hostvars[hosts]['ansible_facts']['hostname'] }}
+{% endfor %}

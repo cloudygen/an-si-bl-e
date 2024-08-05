@@ -1,0 +1,57 @@
+---
+- name: creating LV conditionally
+  hosts: all
+  tasks:
+    - name: check if vg named data is available
+      ansible.builtin.debug:
+        msg: Volume group does not exist
+      when: " 'data' not in ansible_facts['lvm']['vgs']  "
+    - name: conditions matching
+      block:
+        - name: Create a logical volume of 140m if vg is available.
+          community.general.lvol:
+            vg: data
+            lv: research
+            size: 140m
+          when: " 'data' in ansible_facts['lvm']['vgs']  "
+      rescue:
+        - name: check if lvm can be created as per requested size
+          ansible.builtin.debug:
+            msg: Could not create logical volume of that size
+          when: " 'data' in ansible_facts['lvm']['vgs']  "
+        - name: creating lvm of 80Mib instead
+          community.general.lvol:
+            vg: data
+            lv: research
+            size: 80m
+          when: " 'data' in ansible_facts['lvm']['vgs']  "
+- name: now create filesystem on lvm, create mount point and mount the lvm finally 
+  hosts: all
+  gather_facts: True
+  tasks:
+    - name: now check if logical volume research is available
+      ansible.builtin.debug:
+        msg: lv research is available in {{ ansible_facts['hostname'] }}
+      when: " 'research' in ansible_facts['lvm']['lvs'] "
+    - name: creating xfs filesystem on the lvm if lv created.
+      community.general.filesystem:
+        fstype: xfs
+        dev: /dev/data/research
+      when: " 'research' in ansible_facts['lvm']['lvs'] "
+    - name: creating mount point if lvm is created.
+      ansible.builtin.file:
+        path: /opt/conditionalStorage
+        state: directory
+        mode: '0755'
+        owner: root
+        group: root
+      when: " 'research' in ansible_facts['lvm']['lvs'] "
+    - name: mounting the lvm if lv is created conditionally
+      ansible.posix.mount:
+        path: /opt/conditionalStorage
+        src: /dev/data/research
+        fstype: xfs
+        opts: noatime
+        state: mounted
+      when: " 'research' in ansible_facts['lvm']['lvs'] "
+...

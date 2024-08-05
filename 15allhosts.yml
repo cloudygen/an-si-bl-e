@@ -1,0 +1,13 @@
+---
+- name: gathering facts from all hosts
+  hosts: all
+  gather_facts: True
+  tasks: []
+- name: templating hosts file on pub host groups
+  hosts: pub
+  tasks:
+  - name: Template a file to /etc/myhosts in pub group
+    ansible.builtin.template:
+      src: templates/hosts.j2
+      dest: /etc/myhosts
+...

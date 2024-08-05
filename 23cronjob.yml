@@ -1,0 +1,12 @@
+---
+- name: using cronjob to send output in all hosts using cron.d
+  hosts: all
+  tasks:
+    - name: Creates a cron file under /etc/cron.d
+      ansible.builtin.cron:
+        name: exam cron
+        minute: "*/2"
+        user: samaya
+        job: ' echo "Ex294 Exam in process" > /tmp/rhceexamongoing '
+        cron_file: EX294
+...

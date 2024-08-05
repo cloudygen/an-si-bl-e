@@ -1,0 +1,62 @@
+---
+- name: checking web packages
+  hosts: db,dev,prod,backup
+  tasks:
+  - name: Gather the package facts
+    ansible.builtin.package_facts:
+      manager: auto
+  - name: remove nginx if installed
+    ansible.builtin.dnf:
+      name: nginx
+      state: absent 
+    when: "'nginx' in ansible_facts.packages"
+  - name: remove httpd if installed
+    ansible.builtin.dnf:
+      name: httpd
+      state: absent 
+    when: "'httpd' in ansible_facts.packages"
+  - name: install httpd
+    ansible.builtin.dnf:
+      name: httpd
+      state: latest
+  - name: start and enable httpd
+    ansible.builtin.service:
+      name: httpd
+      state: started
+      enabled: yes
+  - name: allow http from firewall
+    ansible.posix.firewalld:
+      service: http
+      permanent: true
+      immediate: true
+      state: enabled
+  - name: Create a directory if it does not exist
+    ansible.builtin.file:
+      path: /opt/rhceexam
+      state: directory
+      mode: '0755'
+      owner: root
+      group: root
+      setype: httpd_sys_content_t
+  - name: Create a symbolic link
+    ansible.builtin.file:
+      src: /opt/rhceexam
+      dest: /var/www/html/rhceexam
+      owner: root
+      group: root
+      state: link
+  - name: templating index file to custom directory
+    ansible.builtin.template:
+      src: templates/11index.html.j2
+      dest: /opt/rhceexam/index.html
+      owner: root
+      group: root
+      mode: '0664'
+      setype: httpd_sys_content_t
+    notify: restart-web
+  handlers:
+  - name: restart-web
+    ansible.builtin.service:
+      name: httpd
+      state: restarted
+...

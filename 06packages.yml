@@ -1,0 +1,19 @@
+---
+- name: installing packages on specified hosts
+  hosts: all
+  tasks:
+    - name: installing php and mariadb in db and backup nodes
+      ansible.builtin.dnf:
+        name: 
+            - php
+            - mariadb
+        state: latest
+      when: inventory_hostname in groups['db'] or inventory_hostname in groups['backup']
+    - name: installing package groups in prod nodes
+      ansible.builtin.dnf:
+        name: 
+            - "@RPM Development Tools"
+            - "@Security Tools"
+        state: latest
+      when: inventory_hostname in groups['prod']
+...

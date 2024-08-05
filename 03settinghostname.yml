@@ -1,0 +1,12 @@
+---
+- name: setting hostnames conditionally
+  hosts: all
+  vars_files:
+    - variables/03settingHNvar.yml
+  tasks:
+    - name: setting hostname on all hosts conditionally
+      ansible.builtin.hostname:
+        name: "{{ item.nm }}"
+      loop: "{{ hosts }}"
+      when: ansible_facts['default_ipv4']['address'] == item.ip
+...

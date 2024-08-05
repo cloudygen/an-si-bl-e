@@ -1,0 +1,17 @@
+myusers: 
+- name: ram 
+  job: developer
+- name: vivek
+  job: developer
+- name: shyam 
+  job: manager
+- name: prakash
+  job: manager 
+- name: sita 
+  job: developer
+- name: laxman
+  job: developer
+- name: prabhat
+  job: dba
+- name: pramesh
+  job: dba

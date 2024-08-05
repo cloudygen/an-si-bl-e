@@ -1,0 +1,66 @@
+---
+- name: creating users conditionally
+  hosts: all
+  vars:
+    myusers:
+    - name: ram
+      job: developer
+    - name: vivek
+      job: developer
+    - name: shyam
+      job: manager
+    - name: prakash
+      job: manager
+    - name: sita
+      job: developer
+    - name: laxman
+      job: developer
+    - name: prabhat
+      job: dba
+    - name: pramesh
+      job: dba
+  vars_files: locker.yml
+  tasks:
+    - name: creating devops group in dev and prod
+      ansible.builtin.group:
+        name: devops
+        state: present
+      when: inventory_hostname in groups['dev'] or inventory_hostname in groups['prod']
+    - name: creating mgrs group in prod and backup host group 
+      ansible.builtin.group:
+        name: mgrs
+        state: present
+      when: inventory_hostname in groups['prod'] or inventory_hostname in groups['backup']
+    - name: creating dbadm group in db and backup node
+      ansible.builtin.group:
+        name: dbadm
+        state: present
+      when: inventory_hostname in groups['db'] or inventory_hostname in groups['backup']
+    - name: creating developer users in dev and prod hosts
+      ansible.builtin.user:
+        name: "{{ item.name }}"
+        password: "{{ PW_developer | password_hash('sha512') }}"
+        groups: devops
+      when: 
+        - item.job == "developer"
+        - inventory_hostname in groups['dev'] or inventory_hostname in groups['prod']
+      loop: "{{ myusers }}"
+    - name: creating manager users in prod and backup host group
+      ansible.builtin.user:
+        name: "{{ item.name }}"
+        password: "{{ PW_manager | password_hash('sha512') }}"
+        groups: mgrs
+      when:
+        - item.job == "manager"
+        - inventory_hostname in groups['prod'] or inventory_hostname in groups['backup']
+      loop: "{{ myusers }}"
+    - name: creating dba users in db and backup host group
+      ansible.builtin.user:
+        name: "{{ item.name }}"
+        password: "{{ PW_dba | password_hash('sha512') }}"
+        groups: dbadm
+      when:
+        - item.job == "dba"
+        - inventory_hostname in groups['db'] or inventory_hostname in groups['backup']
+      loop: "{{ myusers }}"
+...

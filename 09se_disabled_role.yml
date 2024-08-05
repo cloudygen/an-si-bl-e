@@ -1,0 +1,8 @@
+---
+- name: changing selinux status to disabled on all hosts
+  hosts: all
+  vars:
+    selinux_state: disabled
+  roles:
+    - rhel-system-roles.selinux
+...

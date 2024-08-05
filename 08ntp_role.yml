@@ -1,0 +1,16 @@
+---
+- name: Manage timesync with 3 servers
+  hosts: all
+  vars:
+    timesync_ntp_servers:
+      - hostname: 0.asia.pool.ntp.org
+        iburst: true
+      - hostname: 1.asia.pool.ntp.org
+        iburst: true
+      - hostname: 2.asia.pool.ntp.org
+        iburst: true
+      - hostname: 3.asia.pool.ntp.org
+        iburst: true
+  roles:
+    - rhel-system-roles.timesync
+...

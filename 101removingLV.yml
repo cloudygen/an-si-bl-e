@@ -1,0 +1,16 @@
+---
+- name: removing lv from all hosts conditionally if available
+  hosts: all
+  tasks:
+    - name: check to see if lv research is available.
+      ansible.builtin.debug:
+        msg: lv exists in {{ ansible_facts['hostname'] }}
+      when: " 'research' in ansible_facts['lvm']['lvs'] "
+    - name: remove research logical volume if exists
+      community.general.lvol:
+        vg: data
+        lv: research
+        state: absent
+        force: true
+      when: " 'research' in ansible_facts['lvm']['lvs'] "
+...

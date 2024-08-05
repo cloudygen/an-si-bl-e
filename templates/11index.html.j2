@@ -1,0 +1,5 @@
+<H1>Welcome to {{ ansible_facts['hostname'] }}.<br>
+The IP of the system is: {{ ansible_facts['default_ipv4']['address'] }}<br>
+The size of sda is: {{ ansible_facts['devices']['sda']['size'] }}<br>
+Total Memory: {{ ansible_facts['memtotal_mb'] }}<br>
+Virtualized on: {{ ansible_facts['bios_version'] }}</H1>

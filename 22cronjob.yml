@@ -1,0 +1,13 @@
+---
+- name: setting cronjob for shyam user 
+  hosts: dev
+  tasks:
+    - name: creating disk out and date to /home/shyam/diskJob.txt as shyam user
+      ansible.builtin.cron:
+        name: "disk-time output"
+        minute: "15"
+        hour: "15"
+        weekday: '1-5'
+        user: shyam
+        job: "df -hP >> /home/shyam/diskJob.txt; date >> /home/shyam/diskJob.txt"
+...

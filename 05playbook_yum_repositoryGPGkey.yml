@@ -1,0 +1,23 @@
+---
+- name: creating yum repository on client nodes
+  hosts: dev,db,prod,backup
+  tasks:
+    - name: adding local base repository
+      ansible.builtin.yum_repository:
+        name: EX294_BASE
+        description: EX294 base software
+        baseurl: http://192.168.1.247/repos/BaseOS/
+        gpgcheck: yes
+        enabled: yes
+    - name: adding local app repository
+      ansible.builtin.yum_repository:
+        name: EX294_STREAM
+        description: EX294 stream software
+        baseurl: http://192.168.1.247/repos/AppStream
+        gpgcheck: yes
+        enabled: yes
+    - name: Import a key from a url
+      ansible.builtin.rpm_key:
+        state: present
+        key: http://192.168.1.247/RPM-GPG-KEY.dag.txt
+...

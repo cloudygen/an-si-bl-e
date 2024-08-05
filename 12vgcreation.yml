@@ -1,0 +1,19 @@
+---
+- name: creating vg in selected hosts only
+  hosts: dev,db,prod
+  tasks:
+  - name: creating a new single primary partition /dev/sdb1 for LVM
+    community.general.parted:
+      device: /dev/sdb
+      number: 1
+      flags: [ lvm ]
+      label: gpt
+      state: present
+      part_start: 0%
+      part_end: 100%
+    when: " 'sdb' in ansible_facts['devices'] "
+  - name: creating volume group named data from /dev/sdb1 using default pe size
+    community.general.lvg:
+      vg: data
+      pvs: /dev/sdb1
+...

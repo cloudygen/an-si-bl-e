@@ -1,0 +1,59 @@
+---
+- name: creating partitions conditionally
+  hosts: all
+  tasks:
+    - name: check if /dev/sdc is present on all hosts
+      ansible.builtin.debug:
+        msg: disk does not exist
+      when: " 'sdc' not in ansible_facts['devices'] "
+    - name: using block and rescue
+      block:
+       - name: creating 280 MiB ext4 partition size from /dev/sdc1 with GPT label
+         community.general.parted:
+           label: gpt
+           device: /dev/sdc
+           number: 1
+           state: present
+           fs_type: ext4
+           part_end: 280MiB
+         when: " 'sdc' in ansible_facts['devices'] "
+      rescue:
+       - name: 280m partition size cannot be created message
+         ansible.builtin.debug:
+           msg: Could not create Partition of that size
+         when: " 'sdc' in ansible_facts['devices'] "
+       - name: creating 110mib instead from /dev/sdc
+         community.general.parted:
+           label: gpt
+           device: /dev/sdc
+           number: 1
+           state: present
+           fs_type: ext4
+           part_end: 110MiB
+         when: " 'sdc' in ansible_facts['devices'] "
+- name: creating filesystem, mount point, and mounting /dev/sdc1 to the mount point if sdc1 is created
+  hosts: all
+  gather_facts: True
+  tasks:
+    - name: Create an ext4 filesystem on /dev/sdc1
+      community.general.filesystem:
+        fstype: ext4
+        dev: /dev/sdc1
+      when: " 'sdc' in ansible_facts['devices'] "
+    - name: creating /opt/disk02 mount point if /dev/sdc1 exists
+      ansible.builtin.file:
+        path: /opt/disk02 
+        state: directory
+        mode: '0755'
+        owner: root
+        group: root
+      when: " 'sdc' in ansible_facts['devices'] "
+    - name: mounting /dev/sdc1 to /opt/disk02 if /dev/sdc1 exists
+      ansible.posix.mount:
+        path: /opt/disk02
+        src: /dev/sdc1
+        fstype: ext4
+        opts: defaults
+        state: mounted
+      when: " 'sdc' in ansible_facts['devices'] "
+...

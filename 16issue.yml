@@ -1,0 +1,22 @@
+---
+- name: generating issue file in selected hosts conditionally
+  hosts: all
+  tasks:
+    - name: adding content to file in dev host with jinja2 template
+      ansible.builtin.copy:
+        content: "developing @ {{ ansible_facts['hostname'] }}"
+        dest: /etc/issue
+      when: inventory_hostname in groups['dev'] 
+
+    - name: adding content to file in db host with jinja2 template
+      ansible.builtin.copy:
+        content: "dba @ {{ ansible_facts['hostname'] }}"
+        dest: /etc/issue
+      when: inventory_hostname in groups['db'] 
+    
+    - name: adding content to file in prod host with jinja2 template
+      ansible.builtin.copy:
+        content: "producing @ {{ ansible_facts['hostname'] }}"
+        dest: /etc/issue
+      when: inventory_hostname in groups['prod'] 
+...

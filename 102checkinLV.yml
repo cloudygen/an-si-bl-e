@@ -1,0 +1,9 @@
+---
+- name: checking research lv in all hosts
+  hosts: all
+  tasks:
+    - name: check to see if lv research is available.
+      ansible.builtin.debug:
+        msg: research lv exists in {{ ansible_facts['hostname'] }}
+      when: " 'research' in ansible_facts['lvm']['lvs'] "
+...

@@ -1,0 +1,11 @@
+hosts:
+  - ip: 192.168.1.247
+    nm: control.local
+  - ip: 192.168.1.239
+    nm: dev.local
+  - ip: 192.168.1.176
+    nm: db.local
+  - ip: 192.168.1.189
+    nm: prod.local
+  - ip: 192.168.1.137
+    nm: backup.local

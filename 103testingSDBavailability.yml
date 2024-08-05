@@ -1,0 +1,9 @@
+---
+- name: testing if sdb is available on all hosts
+  hosts: all
+  tasks:
+    - name: check if sdb is available on all hosts
+      ansible.builtin.debug:
+        msg: sdb is available in {{ ansible_facts['hostname'] }}
+      when: " 'sdb'  in ansible_facts['devices'] "
+...

@@ -1,0 +1,6 @@
+---
+- name: installing web httpd using downloaded role
+  hosts: dev,db,prod,backup
+  roles:
+      - roles/httpdrole
+...

@@ -1,0 +1,11 @@
+---
+- name: testing out cron job in localhost
+  hosts: control
+  tasks:
+    - name: creating cron job as rhce user every 2 minutes date out to /tmp
+      ansible.builtin.cron:
+        name: date every 2 minutes
+        minute: "*/2"
+        user: rhceuser
+        job: "date >> /tmp/date2mins"
+...

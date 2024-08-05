@@ -1,0 +1,25 @@
+---
+- name: removing web packages if available
+  hosts: dev,db,prod,backup
+  vars:
+    pkg:
+      - nginx
+      - httpd
+  tasks:
+    - name: Gather the package facts
+      ansible.builtin.package_facts:
+        manager: auto
+    - name: removing web package if available
+      ansible.builtin.dnf:
+        name: "{{ item }}"
+        state: absent
+      loop: "{{ pkg }}"
+      when: "'nginx' in ansible_facts.packages or 'httpd' in ansible_facts.packages"
+    - name: removing http allow via firewall if available
+      ansible.posix.firewalld:
+        service: http
+        state: disabled
+        permanent: true
+        immediate: true
+      when: "'nginx' in ansible_facts.packages or 'httpd' in ansible_facts.packages"
+...

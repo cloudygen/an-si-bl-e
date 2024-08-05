@@ -1,0 +1,5 @@
+a. Inventory hostname: {{ ansible_facts['hostname'] }}
+b. Total Memory: {{ ansible_facts['memtotal_mb'] }}
+c. BIOS version: {{ ansible_facts['bios_version'] }}
+d. Size of disk device sda : {{ ansible_facts['devices']['sda']['size'] }}
+e. Size of disk device sdb: NONE
